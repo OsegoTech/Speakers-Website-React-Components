@@ -12,7 +12,6 @@ export default async function handler(req, res) {
   const jsonFile = path.resolve("./", "db.json");
   try {
     const readFileData = await readFile(jsonFile);
-    const data = JSON.parse(readFileData);
     await delay(1000);
     const speakers = JSON.parse(readFileData).speakers;
     if (speakers) {
