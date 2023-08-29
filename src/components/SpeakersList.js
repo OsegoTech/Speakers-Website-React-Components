@@ -1,13 +1,22 @@
 import Speaker from "./Speaker";
 import ReactPlaceholder from "react-placeholder";
-import useRequestDelay, {
-  REQUEST_STATUS,
-} from "../hooks/useRequestDelay";
+import useRequestRest, { REQUEST_STATUS } from "../hooks/useRequestRest";
 import { data } from "../../SpeakerData";
+import { useContext } from "react";
+import { SpeakerFilterContext } from "../contexts/SpeakerFilterContext";
+import SpeakerAdd from "./SpeakerAdd";
 
-function SpeakersList({ showSessions }) {
-  const { data: speakersData, requestStatus, error, updateRecord } =
-    useRequestDelay(2000, data);
+function SpeakersList() {
+  const {
+    data: speakersData,
+    requestStatus,
+    error,
+    updateRecord,
+    insertRecord,
+    deleteRecord
+  } = useRequestRest();
+
+  const { searchQuery, eventYear } = useContext(SpeakerFilterContext);
 
   if (requestStatus === REQUEST_STATUS.FAILURE)
     return (
@@ -26,22 +35,31 @@ function SpeakersList({ showSessions }) {
         className="speakerslist-placeholder"
         ready={requestStatus === REQUEST_STATUS.SUCCESS}
       >
+        <SpeakerAdd eventYear={eventYear} insertRecord={insertRecord} />
         <div className="row">
-          {speakersData.map(function (speaker) {
-            return (
-              <Speaker
-                key={speaker.id}
-                speaker={speaker}
-                showSessions={showSessions}
-                onFavoriteToggle={(doneCallback) => {
-                  updateRecord({
-                    ...speaker,
-                    favorite: !speaker.favorite,
-                  }, doneCallback);
-                }}
-              />
-            );
-          })}
+          {speakersData
+            .filter(function (speaker) {
+              return (
+                speaker.first.toLowerCase().includes(searchQuery) ||
+                speaker.last.toLowerCase().includes(searchQuery)
+              );
+            })
+            .filter(function (speaker) {
+              return speaker.sessions.find((session) => {
+                return session.eventYear === eventYear;
+              });
+            })
+            .map(function (speaker) {
+              return (
+                <Speaker
+                  key={speaker.id}
+                  speaker={speaker}
+                  updateRecord={updateRecord}
+                  insertRecord={insertRecord}
+                  deleteRecord={deleteRecord}
+                />
+              );
+            })}
         </div>
       </ReactPlaceholder>
     </div>
