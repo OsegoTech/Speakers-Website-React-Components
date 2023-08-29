@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import React, { useState, useContext, memo } from "react";
 import { SpeakerFilterContext } from "../contexts/SpeakerFilterContext";
 import { SpeakerProvider, SpeakerContext } from "../contexts/SpeakerContext";
 import SpeakerDelete from "./SpeakerDelete";
@@ -35,12 +35,14 @@ function Sessions() {
 function ImageWithFallback({ src, ...props }) {
   const [error, setError] = useState(false);
   const [imgSrc, setImgSrc] = useState(src);
+
   function onError() {
     if (!error) {
       setImgSrc("/images/speaker-99999.jpg");
       setError(true);
     }
   }
+
   return <img src={imgSrc} {...props} onError={onError} />;
 }
 
@@ -63,13 +65,13 @@ function SpeakerImage() {
 function SpeakerFavorite() {
   const { speaker, updateRecord } = useContext(SpeakerContext);
   const [inTransition, setInTransition] = useState(false);
-
   function doneCallback() {
     setInTransition(false);
     console.log(
-      `In the SpeakerFavorite:doneCallback ${new Date().getMilliseconds()}`
+      `In SpeakerFavorite:doneCallback    ${new Date().getMilliseconds()}`
     );
   }
+
   return (
     <div className="action padB1">
       <span
@@ -90,15 +92,12 @@ function SpeakerFavorite() {
               ? "fa fa-star orange"
               : "fa fa-star-o orange"
           }
-        ></i>
-        {""}
+        />{" "}
         Favorite{" "}
         {inTransition ? (
           <span className="fas fa-circle-notch fa-spin"></span>
         ) : null}
       </span>
-      &nbsp;&nbsp;
-      <span>Favorite</span>
     </div>
   );
 }
@@ -131,14 +130,20 @@ function SpeakerDemographics() {
   );
 }
 
-function Speaker({ speaker, updateRecord, insertRecord, deleteRecord }) {
+const Speaker = memo(function Speaker({
+  speaker,
+  updateRecord,
+  insertRecord,
+  deleteRecord,
+}) {
   const { showSessions } = useContext(SpeakerFilterContext);
+  console.log(`speaker: ${speaker.id} ${speaker.first} ${speaker.last}`);
   return (
     <SpeakerProvider
-      insertRecord={insertRecord}
-      deleteRecord={deleteRecord}
       speaker={speaker}
       updateRecord={updateRecord}
+      insertRecord={insertRecord}
+      deleteRecord={deleteRecord}
     >
       <div className="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-sm-12 col-xs-12">
         <div className="card card-height p-4 mt-4">
@@ -150,6 +155,11 @@ function Speaker({ speaker, updateRecord, insertRecord, deleteRecord }) {
       </div>
     </SpeakerProvider>
   );
+},
+areEqualSpeaker);
+
+function areEqualSpeaker(prevProps, nextProps) {
+  return prevProps.speaker.favorite === nextProps.speaker.favorite;
 }
 
 export default Speaker;
