@@ -41,7 +41,7 @@ function SpeakersList() {
               );
             })
             .filter(function (speaker) {
-              return speaker.sessions.find(function (session) {
+              return speaker.sessions.find((session) => {
                 return session.eventYear === eventYear;
               });
             })
@@ -50,15 +50,7 @@ function SpeakersList() {
                 <Speaker
                   key={speaker.id}
                   speaker={speaker}
-                  onFavoriteToggle={(doneCallback) => {
-                    updateRecord(
-                      {
-                        ...speaker,
-                        favorite: !speaker.favorite,
-                      },
-                      doneCallback
-                    );
-                  }}
+                  updateRecord={updateRecord}
                 />
               );
             })}

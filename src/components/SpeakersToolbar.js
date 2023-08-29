@@ -9,7 +9,6 @@ function SpeakersToolbar() {
     setShowSessions,
     eventYear,
     setEventYear,
-    searchQuery,
     setSearchQuery,
     EVENT_YEARS,
   } = useContext(SpeakerFilterContext);
