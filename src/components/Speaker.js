@@ -73,7 +73,9 @@ function SpeakerFavorite() {
       >
         <i
           className={
-            speaker.favorite === true ? "fa fa-star orange" : "fa fa-star-o orange"
+            speaker.favorite === true
+              ? "fa fa-star orange"
+              : "fa fa-star-o orange"
           }
         ></i>
         {""}
@@ -98,9 +100,7 @@ function SpeakerDemographics() {
           {first} {last}
         </h3>
       </div>
-      <SpeakerFavorite
-    
-      />
+      <SpeakerFavorite />
       <div>
         <p className="card-description">{bio}</p>
         <div className="social d-flex flex-row mt-4">
@@ -118,17 +118,21 @@ function SpeakerDemographics() {
   );
 }
 
-function Speaker({ speaker, updateRecord }) {
-  const { id, first, last, sessions } = speaker;
+function Speaker({ speaker, updateRecord, insertRecord, deleteRecord }) {
   const { showSessions } = useContext(SpeakerFilterContext);
   return (
-    <SpeakerProvider speaker={speaker} updateRecord={updateRecord}>
+    <SpeakerProvider
+      insertRecord={insertRecord}
+      deleteRecord={deleteRecord}
+      speaker={speaker}
+      updateRecord={updateRecord}
+    >
       <div className="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-sm-12 col-xs-12">
         <div className="card card-height p-4 mt-4">
           <SpeakerImage />
           <SpeakerDemographics />
         </div>
-        {showSessions === true ? <Sessions  /> : null}
+        {showSessions === true ? <Sessions /> : null}
       </div>
     </SpeakerProvider>
   );

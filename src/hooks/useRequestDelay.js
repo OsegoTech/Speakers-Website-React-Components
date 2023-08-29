@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 
 export const REQUEST_STATUS = {
-    LOADING: "loading",
-    SUCCESS: "success",
-    FAILURE: "failure",
+  LOADING: "loading",
+  SUCCESS: "success",
+  FAILURE: "failure",
 };
 
 function useRequestDelay(delayTime = 1000, initialData = []) {
   const [data, setData] = useState(initialData);
-    const [requestStatus, setRequestStatus] = useState(REQUEST_STATUS.LOADING);
+  const [requestStatus, setRequestStatus] = useState(REQUEST_STATUS.LOADING);
   const [error, setError] = useState("");
 
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -29,19 +29,19 @@ function useRequestDelay(delayTime = 1000, initialData = []) {
     delayFunc();
   }, []);
 
-  function updateRecord(recordUpdated, doneCallback) {
+  function updateRecord(record, doneCallback) {
     const originalRecords = [...data];
     const newRecords = data.map(function (rec) {
-      return rec.id === recordUpdated.id ? recordUpdated : rec;
+      return rec.id === record.id ? record : rec;
     });
 
     async function delayFunction() {
-      try{
+      try {
         setData(newRecords);
-      await delay(delayTime);
-      if (doneCallback) {
-        doneCallback();
-      }
+        await delay(delayTime);
+        if (doneCallback) {
+          doneCallback();
+        }
       } catch (e) {
         console.log("error thrown inside delayFunction", e);
         if (doneCallback) {
@@ -54,21 +54,53 @@ function useRequestDelay(delayTime = 1000, initialData = []) {
     delayFunction();
   }
 
-  // function onFavoriteToggle(id) {
-  //   const speakerRecPrevious = speakersData.find(function (rec) {
-  //     return rec.id === id;
-  //   });
-  //   const speakerRecUpdated = {
-  //     ...speakerRecPrevious,
-  //     favorite: !speakerRecPrevious.favorite,
-  //   };
-  //   const speakersDataNew = speakersData.map(function (rec) {
-  //     return rec.id === id ? speakerRecUpdated : rec;
-  //   });
-  //   setSpeakersData(speakersDataNew);
-  // }
+  function insertRecord(record, doneCallback) {
+    const originalRecords = [...data];
+    const newRecords = [record, ...data];
 
-    return { data, requestStatus, error, updateRecord };
+    async function delayFunction() {
+      try {
+        setData(newRecords);
+        await delay(delayTime);
+        if (doneCallback) {
+          doneCallback();
+        }
+      } catch (e) {
+        console.log("error thrown inside delayFunction", e);
+        if (doneCallback) {
+          doneCallback();
+        }
+        setData(originalRecords);
+      }
+    }
+
+    delayFunction();
+  }
+
+  function deleteRecord(record, doneCallback) {
+    const originalRecords = [...data];
+    const newRecords = data.filter((rec) => rec.id !== record.id);
+
+    async function delayFunction() {
+      try {
+        setData(newRecords);
+        await delay(delayTime);
+        if (doneCallback) {
+          doneCallback();
+        }
+      } catch (e) {
+        console.log("error thrown inside delayFunction", e);
+        if (doneCallback) {
+          doneCallback();
+        }
+        setData(originalRecords);
+      }
+    }
+
+    delayFunction();
+  }
+
+  return { data, requestStatus, error, updateRecord, insertRecord, deleteRecord };
 }
 
 export default useRequestDelay;
